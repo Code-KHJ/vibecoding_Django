@@ -1,3 +1,57 @@
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .models import Memo
+from .forms import MemoForm
 
-# Create your views here.
+
+class MemoListView(LoginRequiredMixin, ListView):
+	model = Memo
+	template_name = 'memos/memo_list.html'
+	context_object_name = 'memos'
+	paginate_by = 10
+
+	def get_queryset(self):
+		return Memo.objects.filter(author=self.request.user).order_by('-created_at')
+
+
+class MemoDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+	model = Memo
+	template_name = 'memos/memo_detail.html'
+
+	def test_func(self):
+		memo = self.get_object()
+		return memo.author == self.request.user
+
+
+class MemoCreateView(LoginRequiredMixin, CreateView):
+	model = Memo
+	form_class = MemoForm
+	template_name = 'memos/memo_form.html'
+	success_url = reverse_lazy('memos:list')
+
+	def form_valid(self, form):
+		form.instance.author = self.request.user
+		return super().form_valid(form)
+
+
+class MemoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+	model = Memo
+	form_class = MemoForm
+	template_name = 'memos/memo_form.html'
+	success_url = reverse_lazy('memos:list')
+
+	def test_func(self):
+		memo = self.get_object()
+		return memo.author == self.request.user
+
+
+class MemoDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+	model = Memo
+	template_name = 'memos/memo_confirm_delete.html'
+	success_url = reverse_lazy('memos:list')
+
+	def test_func(self):
+		memo = self.get_object()
+		return memo.author == self.request.user
+
