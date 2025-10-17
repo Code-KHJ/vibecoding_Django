@@ -12,9 +12,12 @@ class MemoListView(LoginRequiredMixin, ListView):
 	paginate_by = 10
 
 	def get_queryset(self):
-		return Memo.objects.filter(author=self.request.user).order_by('-created_at')
-
-
+		queryset = Memo.objects.filter(author=self.request.user)
+		search_query = self.request.GET.get('search')
+		if search_query:
+			queryset = queryset.filter(title__icontains=search_query) | \
+					  queryset.filter(content__icontains=search_query)
+		return queryset.order_by('-created_at')
 class MemoDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 	model = Memo
 	template_name = 'memos/memo_detail.html'

@@ -1,38 +1,73 @@
-{% extends 'base.html' %}
-
-{% block title %}내 메모{% endblock %}
-
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>내 메모</h2>
-    <a href="{% url 'memos:create' %}" class="btn btn-primary">새 메모</a>
+{% extends 'base.html' %} {% block title %}내 메모{% endblock %} {% block
+content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="fas fa-sticky-note me-2"></i>내 메모</h2>
+    </div>
+    <div class="col-md-6">
+        <form class="d-flex justify-content-end gap-2" method="get">
+            <div class="search-form flex-grow-1">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="메모 검색..." 
+                           value="{{ request.GET.search|default:'' }}">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <a href="{% url 'memos:create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>새 메모
+            </a>
+        </form>
+    </div>
 </div>
 
 {% if memos %}
-    <div class="list-group">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for memo in memos %}
-            <a href="{% url 'memos:detail' memo.pk %}" class="list-group-item list-group-item-action">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">{{ memo.title }}</h5>
-                    <small>{{ memo.created_at|date:"Y-m-d H:i" }}</small>
+            <div class="col">
+                <div class="card h-100 shadow-sm memo-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title mb-3">{{ memo.title }}</h5>
+                            <span class="badge bg-primary rounded-pill">
+                                <i class="fas fa-clock me-1"></i>
+                                {{ memo.created_at|date:"m/d" }}
+                            </span>
+                        </div>
+                        <p class="card-text text-muted mb-3">{{ memo.content|truncatechars:100 }}</p>
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'memos:detail' memo.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>자세히 보기
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <p class="mb-1 text-truncate">{{ memo.content }}</p>
-            </a>
+            </div>
         {% endfor %}
     </div>
 
-    <nav aria-label="Page navigation" class="mt-3">
-        <ul class="pagination">
-            {% if page_obj.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">이전</a></li>
-            {% endif %}
-            <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-            {% if page_obj.has_next %}
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">다음</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+<nav aria-label="Page navigation" class="mt-3">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+        >이전</a
+      >
+    </li>
+    {% endif %}
+    <li class="page-item disabled">
+      <span class="page-link"
+        >{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span
+      >
+    </li>
+    {% if page_obj.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.next_page_number }}">다음</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
 {% else %}
-    <p>작성된 메모가 없습니다.</p>
-{% endif %}
-{% endblock %}
+<p>작성된 메모가 없습니다.</p>
+{% endif %} {% endblock %}

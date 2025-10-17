@@ -1,17 +1,12 @@
-{% extends 'base.html' %}
-{% load crispy_forms_tags %}
-
-{% block title %}메모 작성{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block title %}메모
+작성{% endblock %} {% block content %}
 <div class="card">
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" class="btn btn-primary">저장</button>
-            <a href="{% url 'memos:list' %}" class="btn btn-link">취소</a>
-        </form>
-    </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %} {{ form|crispy }}
+      <button type="submit" class="btn btn-primary">저장</button>
+      <a href="{% url 'memos:list' %}" class="btn btn-link">취소</a>
+    </form>
+  </div>
 </div>
 {% endblock %}
